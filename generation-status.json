@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-06-09T08:52:50.370Z",
+  "theme": "古典舞",
+  "model": "gpt-image-2",
+  "taxonomy": "画面视觉风格",
+  "totals": {
+    "styles": 96,
+    "categories": 12,
+    "pageTypes": 7,
+    "slides": 672,
+    "generated": 636,
+    "pending": 36,
+    "completionPercent": 94.64
+  },
+  "byCategory": {
+    "手绘与插画": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "真实与摄影": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "中国传统美学": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "古风与东方幻想": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "科技与未来": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "动画与卡通": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "现代设计": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "材质与工艺": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "严肃与专业": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "潮流与实验": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "空间与场景": {
+      "generated": 56,
+      "pending": 0,
+      "total": 56
+    },
+    "抽象与信息设计": {
+      "generated": 20,
+      "pending": 36,
+      "total": 56
+    }
+  },
+  "byPageType": {
+    "封面页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "目录页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "过渡页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "纯文字页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "文字图片页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "数据/要点页": {
+      "generated": 91,
+      "pending": 5,
+      "total": 96
+    },
+    "结尾页": {
+      "generated": 90,
+      "pending": 6,
+      "total": 96
+    }
+  }
+}
