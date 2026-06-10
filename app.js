@@ -82,6 +82,10 @@ function showToast(message) {
 
 const HEART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C7 16.6 3.5 13.4 3.5 9.7 3.5 7 5.6 5 8.1 5c1.5 0 3 .7 3.9 2 .9-1.3 2.4-2 3.9-2 2.5 0 4.6 2 4.6 4.7 0 3.7-3.5 6.9-8.5 10.8z" fill="currentColor"/></svg>`;
 
+// HTML 转义：所有拼进 innerHTML 的动态文本/属性都过这里，杜绝 XSS（即便将来数据来源变得不可信）
+const esc = (v) =>
+  String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 /* ---------- 渲染：英雄区 ---------- */
 function renderHero() {
   els.statStyles.textContent = data.styles.length;
@@ -95,7 +99,7 @@ function renderHero() {
 /* ---------- 渲染：园区与卡片 ---------- */
 function renderHalls() {
   els.hallStrip.innerHTML = HALLS.map(
-    (h) => `<button class="hall-pill" type="button" data-jump="${h.category}" style="--dot:${h.dot}"><i></i>${h.name}</button>`
+    (h) => `<button class="hall-pill" type="button" data-jump="${esc(h.category)}" style="--dot:${esc(h.dot)}"><i></i>${esc(h.name)}</button>`
   ).join("");
 
   els.halls.innerHTML = HALLS.map((hall) => {
@@ -106,22 +110,22 @@ function renderHalls() {
         const cover = getSlide(style.id, "cover");
         const n = litCount(style.id);
         const img = cover
-          ? `<img src="${thumbOf(cover)}" alt="${style.name}" loading="lazy" decoding="async" width="480" height="270" />`
+          ? `<img src="${esc(thumbOf(cover))}" alt="${esc(style.name)}" loading="lazy" decoding="async" width="480" height="270" />`
           : `<img alt="" loading="lazy" width="480" height="270" />`;
         return `
-        <button class="style-card${cover ? "" : " dim"}" type="button" data-style="${style.id}" style="--i:${i}">
+        <button class="style-card${cover ? "" : " dim"}" type="button" data-style="${esc(style.id)}" style="--i:${i}">
           ${img}
-          <span class="card-name">${style.name}</span>
+          <span class="card-name">${esc(style.name)}</span>
           <span class="card-sub">${cover ? `<span class="lit">已点亮 ${n}/7 页</span>` : "样张准备中"}</span>
-          <span class="fav-btn${state.favs.has(style.id) ? " on" : ""}" data-fav="${style.id}" role="button" aria-label="收藏 ${style.name}">${HEART}</span>
+          <span class="fav-btn${state.favs.has(style.id) ? " on" : ""}" data-fav="${esc(style.id)}" role="button" aria-label="收藏 ${esc(style.name)}">${HEART}</span>
         </button>`;
       })
       .join("");
     return `
-    <section class="hall" id="hall-${encodeURIComponent(hall.category)}" data-hall="${hall.category}" style="--dot:${hall.dot}">
+    <section class="hall" id="hall-${encodeURIComponent(hall.category)}" data-hall="${esc(hall.category)}" style="--dot:${esc(hall.dot)}">
       <div class="hall-head">
-        <h2><i></i>${hall.name}</h2>
-        <p class="hall-guide">${hall.guide}</p>
+        <h2><i></i>${esc(hall.name)}</h2>
+        <p class="hall-guide">${esc(hall.guide)}</p>
         <p class="hall-lit"><b>${lit}</b> / ${styles.length} 套已点亮</p>
       </div>
       <div class="card-grid">${cards}</div>
@@ -190,24 +194,50 @@ function renderDetail() {
   els.detailImage.alt = `${style.name} ${slide?.pageName || ""}`;
   if (slide) {
     els.detailImage.style.backgroundImage = `url("${thumbOf(slide)}")`;
-    els.detailImage.src = cdn(slide.image);
+    const big = cdn(slide.image);
+    if (els.detailImage.getAttribute("src") !== big) {
+      els.detailImage.classList.add("loading"); // 先透明、露出缩略图占位，大图解码完再淡入
+      els.detailImage.src = big;
+      const done = () => els.detailImage.classList.remove("loading");
+      els.detailImage.decode ? els.detailImage.decode().then(done, done) : (els.detailImage.onload = done);
+    }
   } else {
     els.detailImage.style.backgroundImage = "";
+    els.detailImage.classList.remove("loading");
     els.detailImage.removeAttribute("src");
   }
   els.detailHall.textContent = `${hall.name} · ${style.category}`;
   els.detailName.textContent = style.name;
   els.detailMood.textContent = style.mood;
-  els.detailTags.innerHTML = style.tags.map((t) => `<span>${t}</span>`).join("");
+  els.detailTags.innerHTML = style.tags.map((t) => `<span>${esc(t)}</span>`).join("");
   els.detailProgress.innerHTML = `已点亮 <b>${litCount(style.id)}</b> / 7 种页型`;
   els.detailFav.textContent = state.favs.has(style.id) ? "已在收藏 ✓" : "收藏这套";
 
   els.detailPages.innerHTML = data.pageTypes
     .map((p) => {
       const ok = Boolean(getSlide(style.id, p.id));
-      return `<button type="button" data-page="${p.id}" class="${state.detailPage === p.id ? "active" : ""}" ${ok ? "" : "disabled"}>${p.short}</button>`;
+      return `<button type="button" data-page="${esc(p.id)}" class="${state.detailPage === p.id ? "active" : ""}" ${ok ? "" : "disabled"}>${esc(p.short)}</button>`;
     })
     .join("");
+
+  prefetchNeighbors();
+}
+
+// 预取相邻风格的封面大图，左右切换更跟手
+function prefetchNeighbors() {
+  const pool = state.detailPool.length ? state.detailPool : data.styles;
+  if (!pool.length) return;
+  const idx = pool.findIndex((s) => s.id === state.detailId);
+  if (idx < 0) return;
+  for (const j of [idx - 1, idx + 1]) {
+    const s = pool[(j + pool.length) % pool.length];
+    const sl = s && getSlide(s.id, "cover");
+    if (sl) {
+      const im = new Image();
+      im.decoding = "async";
+      im.src = cdn(sl.image);
+    }
+  }
 }
 
 function stepDetail(delta) {
@@ -253,7 +283,7 @@ function startDuel(seedId) {
 }
 function duelCard(style) {
   const hall = hallFor(style.category);
-  return `<img src="${coverThumb(style.id)}" alt="${style.name}" /><strong>${style.name}</strong><small>${hall.name}</small>`;
+  return `<img src="${esc(coverThumb(style.id))}" alt="${esc(style.name)}" /><strong>${esc(style.name)}</strong><small>${esc(hall.name)}</small>`;
 }
 function renderDuel() {
   els.duelRound.textContent = `第 ${state.duelRound} / 5 轮`;
@@ -289,9 +319,9 @@ function renderTray() {
     .map(
       (s) => `
       <div class="tray-item">
-        <img src="${coverThumb(s.id)}" alt="" loading="lazy" />
-        <div><strong>${s.name}</strong><small>${hallFor(s.category).name} · 已点亮 ${litCount(s.id)}/7</small></div>
-        <button class="tray-remove" type="button" data-remove="${s.id}" aria-label="移除 ${s.name}">
+        <img src="${esc(coverThumb(s.id))}" alt="" loading="lazy" />
+        <div><strong>${esc(s.name)}</strong><small>${esc(hallFor(s.category).name)} · 已点亮 ${litCount(s.id)}/7</small></div>
+        <button class="tray-remove" type="button" data-remove="${esc(s.id)}" aria-label="移除 ${esc(s.name)}">
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
         </button>
       </div>`

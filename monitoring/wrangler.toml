@@ -1,0 +1,12 @@
+name = "xiaoluoppt-monitor"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# 先创建 KV：wrangler kv namespace create LOGS
+# 把命令返回的 id 粘贴到下面的 id =
+[[kv_namespaces]]
+binding = "LOGS"
+id = "在这里填入 wrangler 返回的 namespace id"
+
+# 回看口令不写在这里，用命令单独设置（不会进 git）：
+#   wrangler secret put VIEW_TOKEN

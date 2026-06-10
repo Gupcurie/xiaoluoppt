@@ -287,7 +287,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
   border-radius: 12px;
   background: #fff center / cover no-repeat;
   box-shadow: var(--shadow-s);
+  transition: opacity 0.35s var(--soft);
 }
+.detail-stage img.loading { opacity: 0; }
 .detail-pages { display: flex; flex-wrap: wrap; gap: 7px; }
 .detail-pages button {
   min-height: 36px;
