@@ -2,6 +2,14 @@ const data = window.CLASSICAL_DANCE_PPT_DATA;
 const generated = new Set(window.CLASSICAL_DANCE_GENERATED_IMAGES || []);
 const STORAGE_KEY = "flagship-ppt-candidates";
 
+// jsDelivr CDN — free global CDN with Asia-Pacific nodes (HK, SG, Tokyo)
+const CDN_BASE = "https://cdn.jsdelivr.net/gh/Gupcurie/xiaoluoppt@master";
+function cdn(relPath) {
+  // relPath like "./assets/thumbs/xxx.webp" → absolute CDN URL
+  if (!relPath) return "";
+  return CDN_BASE + relPath.replace(/^\./, "");
+}
+
 const HALLS = [
   { category: "手绘与插画", name: "纸上生长原", guide: "水彩、线条与纸张在这里呼吸", dot: "#8fc9a0" },
   { category: "真实与摄影", name: "光影剧场", guide: "追光落下，真实本身就是戏剧", dot: "#f2b36b" },
@@ -45,7 +53,7 @@ function litCount(styleId) {
   return (slidesByStyle.get(styleId) || []).filter((s) => generated.has(s.filename)).length;
 }
 function thumbOf(slide) {
-  return slide ? `./assets/thumbs/${slide.filename.replace(/\.png$/i, ".webp")}` : "";
+  return slide ? cdn(`./assets/thumbs/${slide.filename.replace(/\.png$/i, ".webp")}`) : "";
 }
 function coverThumb(styleId) {
   return thumbOf(getSlide(styleId, "cover"));
@@ -182,7 +190,7 @@ function renderDetail() {
   els.detailImage.alt = `${style.name} ${slide?.pageName || ""}`;
   if (slide) {
     els.detailImage.style.backgroundImage = `url("${thumbOf(slide)}")`;
-    els.detailImage.src = slide.image;
+    els.detailImage.src = cdn(slide.image);
   } else {
     els.detailImage.style.backgroundImage = "";
     els.detailImage.removeAttribute("src");
