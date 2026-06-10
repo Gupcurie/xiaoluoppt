@@ -11,3 +11,6 @@ _backup-*
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# WebP conversion - PNGs excluded
+assets/slides/*.png
