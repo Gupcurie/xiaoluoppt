@@ -1,0 +1,30 @@
+# PNG 原图（WebP 已足够，不部署）
+assets/slides/*.png
+# 备份文件
+_backup-*
+# 工具脚本
+tools/
+# 文档
+*.md
+CHATGPT_WEB_GENERATION.md
+RUN_GENERATION.md
+SCALE_PLAN.md
+# 作业定义
+jobs/
+# 临时文件
+work/
+monitoring/
+# 未压缩的完整数据（已有 min 版）
+slides-data.js
+# 临时文件
+pending-slides.csv
+generation-status.json
+generated-slides.csv
+*.jsonl
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+# Git
+.git
+.gitignore
