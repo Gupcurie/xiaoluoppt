@@ -446,6 +446,31 @@ function bindEvents() {
   });
 }
 
+/* ---------- 图片加载失败自动重试（国内网络不稳定时防破图） ---------- */
+(function () {
+  const MAX = 3;
+  const DELAYS = [1000, 2000, 4000];
+  document.addEventListener(
+    "error",
+    (e) => {
+      const img = e.target;
+      if (!img || img.tagName !== "IMG") return;
+      const retries = Number(img.dataset.imgRetry || 0);
+      if (retries >= MAX) return;
+      img.dataset.imgRetry = retries + 1;
+      const src = img.getAttribute("src");
+      if (!src) return;
+      // 去旧时间戳，加新时间戳避免浏览器缓存失败状态
+      const u = new URL(src, window.location.href);
+      u.searchParams.set("_r", Date.now() + retries);
+      setTimeout(() => {
+        img.src = u.href;
+      }, DELAYS[retries] || 3000);
+    },
+    true
+  );
+})();
+
 renderHero();
 renderHalls();
 refreshFavBtns();
