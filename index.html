@@ -12,8 +12,14 @@
     <title>幻灯游园 · 96 种风格，逛着选</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&family=ZCOOL+KuaiLe&family=Baloo+2:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" />
-    <link rel="stylesheet" href="./styles.css?v=museum-1" />
+    <link rel="stylesheet" href="./styles.css?v=fast-1" />
+    <!-- Google Fonts: async 加载，不阻塞首屏渲染；onsite 后字体替换 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&family=ZCOOL+KuaiLe&family=Baloo+2:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&family=ZCOOL+KuaiLe&family=Baloo+2:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" /></noscript>
+    <!-- 预加载首屏 3 张英雄扇面图（litStyles[0]/[48]/[95]） -->
+    <link rel="preload" href="./assets/thumbs/handdrawn-watercolor-cover.webp" as="image" />
+    <link rel="preload" href="./assets/thumbs/swiss-minimal-cover.webp" as="image" />
+    <link rel="preload" href="./assets/thumbs/generative-art-cover.webp" as="image" />
   </head>
   <body>
     <header class="topbar">
