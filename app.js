@@ -2,27 +2,26 @@ const data = window.CLASSICAL_DANCE_PPT_DATA;
 const generated = new Set(window.CLASSICAL_DANCE_GENERATED_IMAGES || []);
 const STORAGE_KEY = "flagship-ppt-candidates";
 
-// jsDelivr CDN — free global CDN with Asia-Pacific nodes (HK, SG, Tokyo)
-const CDN_BASE = "https://cdn.jsdelivr.net/gh/Gupcurie/xiaoluoppt@master";
+// 图片直接走 GitHub Pages 同源加载（jsDelivr 从国内访问太慢，已移除 CDN 中转）
+// 本地 file:// 或 localhost 同样走相对路径，无需特殊处理
 function cdn(relPath) {
-  // relPath like "./assets/thumbs/xxx.webp" → absolute CDN URL
   if (!relPath) return "";
-  return CDN_BASE + relPath.replace(/^\./, "");
+  return relPath;
 }
 
 const HALLS = [
-  { category: "手绘与插画", name: "纸上生长原", guide: "水彩、线条与纸张在这里呼吸", dot: "#8fc9a0" },
-  { category: "真实与摄影", name: "光影剧场", guide: "追光落下，真实本身就是戏剧", dot: "#f2b36b" },
-  { category: "中国传统美学", name: "山水长卷境", guide: "一滴墨，展开一座东方宇宙", dot: "#7fbfa6" },
-  { category: "古风与东方幻想", name: "月下云台", guide: "宫墙、云海与没写完的故事", dot: "#b5a7e0" },
-  { category: "科技与未来", name: "悬浮数据舱", guide: "信息脱离纸面，开始发光", dot: "#7cc6e8" },
-  { category: "动画与卡通", name: "角色星球", guide: "每一页都像动画的第一帧", dot: "#f7a06b" },
-  { category: "现代设计", name: "形式试验区", guide: "秩序、网格与反秩序共存", dot: "#c9c2b8" },
-  { category: "材质与工艺", name: "材料秘境", guide: "丝绸、陶瓷与金属留下触感", dot: "#d8b36a" },
-  { category: "严肃与专业", name: "零号档案室", guide: "克制、准确，信息有重量", dot: "#a9b7bc" },
-  { category: "潮流与实验", name: "拼贴失控场", guide: "撕开规则，意外就会出现", dot: "#f48fb1" },
-  { category: "空间与场景", name: "微缩舞台盒", guide: "把提案放进一个真实空间", dot: "#e8c36a" },
-  { category: "抽象与信息设计", name: "信号花园", guide: "数据与逻辑长成风景", dot: "#8fd0c0" },
+  { category: "手绘与插画", name: "纸上生长原", no: "第 一 館", guide: "水彩、线条与纸张在这里呼吸", dot: "#a8c9a6" },
+  { category: "真实与摄影", name: "光影剧场", no: "第 二 館", guide: "追光落下，真实本身就是戏剧", dot: "#e0b483" },
+  { category: "中国传统美学", name: "山水长卷境", no: "第 三 館", guide: "一滴墨，展开一座东方宇宙", dot: "#9cc0b8" },
+  { category: "古风与东方幻想", name: "月下云台", no: "第 四 館", guide: "宫墙、云海与没写完的故事", dot: "#b8a8d4" },
+  { category: "科技与未来", name: "悬浮数据舱", no: "第 五 館", guide: "信息脱离纸面，开始发光", dot: "#9bb8d4" },
+  { category: "动画与卡通", name: "角色星球", no: "第 六 館", guide: "每一页都像动画的第一帧", dot: "#f0b89e" },
+  { category: "现代设计", name: "形式试验区", no: "第 七 館", guide: "秩序、网格与反秩序共存", dot: "#c4bcb4" },
+  { category: "材质与工艺", name: "材料秘境", no: "第 八 館", guide: "丝绸、陶瓷与金属留下触感", dot: "#d8c08a" },
+  { category: "严肃与专业", name: "零号档案室", no: "第 九 館", guide: "克制、准确，信息有重量", dot: "#a8b2b8" },
+  { category: "潮流与实验", name: "拼贴失控场", no: "第 十 館", guide: "撕开规则，意外就会出现", dot: "#e8a8a0" },
+  { category: "空间与场景", name: "微缩舞台盒", no: "第十一館", guide: "把提案放进一个真实空间", dot: "#e8d488" },
+  { category: "抽象与信息设计", name: "信号花园", no: "第十二館", guide: "数据与逻辑长成风景", dot: "#a8d4c4" },
 ];
 
 const styleMap = new Map(data.styles.map((s) => [s.id, s]));
@@ -53,7 +52,8 @@ function litCount(styleId) {
   return (slidesByStyle.get(styleId) || []).filter((s) => generated.has(s.filename)).length;
 }
 function thumbOf(slide) {
-  return slide ? cdn(`./assets/thumbs/${slide.filename.replace(/\.png$/i, ".webp")}`) : "";
+  if (!slide) return "";
+  return cdn(`./assets/thumbs/${slide.filename.replace(/\.png$/i, ".webp")}`);
 }
 function coverThumb(styleId) {
   return thumbOf(getSlide(styleId, "cover"));
@@ -124,6 +124,7 @@ function renderHalls() {
     return `
     <section class="hall" id="hall-${encodeURIComponent(hall.category)}" data-hall="${esc(hall.category)}" style="--dot:${esc(hall.dot)}">
       <div class="hall-head">
+        <span class="hall-no">${esc(hall.no || "")}</span>
         <h2><i></i>${esc(hall.name)}</h2>
         <p class="hall-guide">${esc(hall.guide)}</p>
         <p class="hall-lit"><b>${lit}</b> / ${styles.length} 套已点亮</p>
